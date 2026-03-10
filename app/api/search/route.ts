@@ -10,8 +10,20 @@ interface OAWork {
   publication_year: number | null
   cited_by_count: number
   authorships: { author: { display_name: string } }[]
-  primary_location: { source: { display_name: string } | null } | null
+  primary_location: {
+    source: { id: string; display_name: string } | null
+  } | null
   open_access: { is_oa: boolean; oa_url: string | null }
+}
+
+interface OASource {
+  id: string
+  display_name: string
+  summary_stats: {
+    '2yr_mean_citedness': number
+    h_index: number
+    i10_index: number
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -57,6 +69,7 @@ function extractPaper(work: OAWork) {
     title,
     authors,
     venue: work.primary_location?.source?.display_name || '',
+    sourceId: work.primary_location?.source?.id || '',
     year: work.publication_year || 0,
     citations: work.cited_by_count || 0,
     doi,
@@ -65,7 +78,51 @@ function extractPaper(work: OAWork) {
     openAccess: work.open_access?.is_oa || false,
     oaUrl: work.open_access?.oa_url || '',
     category: categorize(title),
+    sjrScore: 0,
+    sjrQuartile: '-',
   }
+}
+
+async function fetchSources(
+  sourceIds: string[],
+): Promise<Map<string, { score: number; quartile: string }>> {
+  const map = new Map<string, { score: number; quartile: string }>()
+  if (sourceIds.length === 0) return map
+
+  /* OpenAlex allows filtering by pipe-separated IDs, max ~50 per request */
+  const chunks: string[][] = []
+  for (let i = 0; i < sourceIds.length; i += 50) {
+    chunks.push(sourceIds.slice(i, i + 50))
+  }
+
+  await Promise.all(
+    chunks.map(async (chunk) => {
+      const ids = chunk.map((id) => id.replace('https://openalex.org/', '')).join('|')
+      const url = `https://api.openalex.org/sources?filter=openalex:${ids}&per_page=50&mailto=research-roadmap@scholar.tools`
+      try {
+        const controller = new AbortController()
+        const timer = setTimeout(() => controller.abort(), 9000)
+        const res = await fetch(url, { signal: controller.signal })
+        clearTimeout(timer)
+        if (!res.ok) return
+        const data = await res.json()
+        for (const src of (data.results || []) as OASource[]) {
+          const score = src.summary_stats?.['2yr_mean_citedness'] || 0
+          const rounded = Math.round(score * 1000) / 1000
+          let quartile = '-'
+          if (rounded > 0) {
+            if (rounded >= 3.0) quartile = 'Q1'
+            else if (rounded >= 1.5) quartile = 'Q2'
+            else if (rounded >= 0.5) quartile = 'Q3'
+            else quartile = 'Q4'
+          }
+          map.set(src.id, { score: rounded, quartile })
+        }
+      } catch { /* timeout or network error — skip */ }
+    }),
+  )
+
+  return map
 }
 
 async function fetchWorks(params: Record<string, string>): Promise<OAWork[]> {
@@ -175,9 +232,26 @@ export async function GET(request: NextRequest) {
 
   /* Sort by citations descending */
   papers.sort((a, b) => b.citations - a.citations)
+  const top = papers.slice(0, 200)
+
+  /* Fetch journal metrics for unique sources */
+  const uniqueSourceIds = [...new Set(top.map((p) => p.sourceId).filter(Boolean))]
+  const sourceMetrics = await fetchSources(uniqueSourceIds)
+
+  /* Merge SJR-like scores into papers */
+  for (const p of top) {
+    if (p.sourceId && sourceMetrics.has(p.sourceId)) {
+      const m = sourceMetrics.get(p.sourceId)!
+      p.sjrScore = m.score
+      p.sjrQuartile = m.quartile
+    }
+  }
+
+  /* Remove internal sourceId before sending to client */
+  const result = top.map(({ sourceId, ...rest }) => rest)
 
   return NextResponse.json({
-    papers: papers.slice(0, 200),
+    papers: result,
     totalFound: papers.length,
     query,
     yearFrom: parseInt(yearFrom),

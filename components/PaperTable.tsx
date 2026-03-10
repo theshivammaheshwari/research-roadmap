@@ -87,6 +87,8 @@ export default function PaperTable({ papers }: { papers: Paper[] }) {
       'Year',
       'Citations',
       'Category',
+      'SJR Score',
+      'SJR Quartile',
       'Open Access',
       'DOI Link',
       'Sci-Hub Link',
@@ -101,6 +103,8 @@ export default function PaperTable({ papers }: { papers: Paper[] }) {
         p.year,
         p.citations,
         p.category,
+        p.sjrScore || '',
+        p.sjrQuartile || '',
         p.openAccess ? 'Yes' : 'No',
         p.doiLink,
         p.sciHubLink,
@@ -205,6 +209,8 @@ export default function PaperTable({ papers }: { papers: Paper[] }) {
                 onSort={toggleSort}
               />
               <th className="px-3 py-3 font-semibold">Category</th>
+              <th className="px-3 py-3 font-semibold text-center whitespace-nowrap">SJR Score</th>
+              <th className="px-3 py-3 font-semibold text-center">Quartile</th>
               <th className="px-3 py-3 font-semibold text-center">OA</th>
               <th className="px-3 py-3 font-semibold text-center">
                 Links
@@ -261,6 +267,30 @@ export default function PaperTable({ papers }: { papers: Paper[] }) {
                   >
                     {p.category}
                   </span>
+                </td>
+                <td className="px-3 py-3 text-center font-medium tabular-nums">
+                  {p.sjrScore > 0 ? p.sjrScore.toFixed(3) : (
+                    <span className="text-slate-300 dark:text-slate-600">—</span>
+                  )}
+                </td>
+                <td className="px-3 py-3 text-center">
+                  {p.sjrQuartile && p.sjrQuartile !== '-' ? (
+                    <span
+                      className={`inline-block px-2 py-0.5 rounded-full text-xs font-bold ${
+                        p.sjrQuartile === 'Q1'
+                          ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                          : p.sjrQuartile === 'Q2'
+                            ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                            : p.sjrQuartile === 'Q3'
+                              ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                              : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                      }`}
+                    >
+                      {p.sjrQuartile}
+                    </span>
+                  ) : (
+                    <span className="text-slate-300 dark:text-slate-600">—</span>
+                  )}
                 </td>
                 <td className="px-3 py-3 text-center">
                   {p.openAccess ? (

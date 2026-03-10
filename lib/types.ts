@@ -11,6 +11,8 @@ export interface Paper {
   openAccess: boolean
   oaUrl: string
   category: string
+  sjrScore: number
+  sjrQuartile: string
 }
 
 export interface SearchResponse {
