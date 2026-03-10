@@ -13,6 +13,7 @@ export interface Paper {
   category: string
   sjrScore: number
   sjrQuartile: string
+  abstract: string
 }
 
 export interface SearchResponse {

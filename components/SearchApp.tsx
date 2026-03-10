@@ -2,6 +2,7 @@
 
 import { useState, useEffect, FormEvent } from 'react'
 import PaperTable from './PaperTable'
+import TrendChart from './TrendChart'
 import { Paper } from '@/lib/types'
 
 /* ------------------------------------------------------------------ */
@@ -217,7 +218,7 @@ export default function SearchApp() {
                 {
                   icon: '🔍',
                   title: 'Smart Search',
-                  desc: 'Searches 6 strategies in parallel for surveys, benchmarks, datasets & more.',
+                  desc: '6 parallel strategies — surveys, benchmarks, datasets, explainability & more.',
                 },
                 {
                   icon: '📖',
@@ -225,9 +226,24 @@ export default function SearchApp() {
                   desc: '3-pass reading method with note-taking template built right in.',
                 },
                 {
+                  icon: '📋',
+                  title: 'Cite & BibTeX',
+                  desc: 'One-click APA/BibTeX citations. Export all as .bib for LaTeX.',
+                },
+                {
+                  icon: '❤️',
+                  title: 'Bookmark & Track',
+                  desc: 'Save papers, mark To Read / Reading / Done. Synced in browser.',
+                },
+                {
+                  icon: '📊',
+                  title: 'Trend Chart',
+                  desc: 'See publication trends year-by-year with visual bar chart.',
+                },
+                {
                   icon: '📥',
                   title: 'Export & Links',
-                  desc: 'CSV export, DOI links, Sci-Hub links, and Open Access PDFs.',
+                  desc: 'CSV export, DOI, Sci-Hub, Open Access PDFs, SJR scores.',
                 },
               ].map((f) => (
                 <div
@@ -306,6 +322,9 @@ export default function SearchApp() {
               ))}
             </div>
           </div>
+
+          {/* Trend chart */}
+          <TrendChart papers={papers} />
 
           {/* Reading guide */}
           <ReadingGuide />

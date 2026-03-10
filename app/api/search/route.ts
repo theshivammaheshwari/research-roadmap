@@ -14,6 +14,7 @@ interface OAWork {
     source: { id: string; display_name: string } | null
   } | null
   open_access: { is_oa: boolean; oa_url: string | null }
+  abstract_inverted_index: Record<string, number[]> | null
 }
 
 interface OASource {
@@ -29,6 +30,18 @@ interface OASource {
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
+function reconstructAbstract(inverted: Record<string, number[]> | null): string {
+  if (!inverted) return ''
+  const words: [string, number][] = []
+  for (const [word, positions] of Object.entries(inverted)) {
+    for (const pos of positions) {
+      words.push([word, pos])
+    }
+  }
+  words.sort((a, b) => a[1] - b[1])
+  return words.map(([w]) => w).join(' ')
+}
+
 function categorize(title: string): string {
   const t = title.toLowerCase()
   if (
@@ -80,6 +93,7 @@ function extractPaper(work: OAWork) {
     category: categorize(title),
     sjrScore: 0,
     sjrQuartile: '-',
+    abstract: reconstructAbstract(work.abstract_inverted_index),
   }
 }
 
