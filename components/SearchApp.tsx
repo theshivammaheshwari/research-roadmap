@@ -318,8 +318,8 @@ export default function SearchApp() {
       )}
 
       {/* ---- Footer ---- */}
-      <footer className="mt-auto bg-slate-100 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-8 px-4">
-        <div className="max-w-4xl mx-auto text-center text-sm text-slate-500 dark:text-slate-400 space-y-1">
+      <footer className="mt-auto bg-slate-100 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-10 px-4">
+        <div className="max-w-4xl mx-auto text-center text-sm text-slate-500 dark:text-slate-400 space-y-4">
           <p className="font-medium">
             Built for PhD scholars &amp; researchers
           </p>
@@ -335,6 +335,56 @@ export default function SearchApp() {
             </a>{' '}
             — free, open scholarly data with 250 M+ works.
           </p>
+
+          <div className="border-t border-slate-200 dark:border-slate-700 pt-4 space-y-2">
+            <p className="text-slate-600 dark:text-slate-300 font-semibold text-base">
+              This website was developed by
+            </p>
+            <p className="text-slate-800 dark:text-white font-bold text-lg">
+              Mr. Shivam Maheshwari
+            </p>
+            <div className="flex flex-col items-center gap-1 text-sm">
+              <p>📞 +91 9468955596</p>
+              <p>
+                ✉️{' '}
+                <a
+                  href="mailto:theshivammaheshwari@gmail.com"
+                  className="text-blue-500 hover:underline"
+                >
+                  theshivammaheshwari@gmail.com
+                </a>
+              </p>
+            </div>
+            <div className="flex justify-center gap-4 pt-2">
+              <a
+                href="https://www.instagram.com/shivam.maheshwary1"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-pink-500 hover:text-pink-400 transition"
+                aria-label="Instagram"
+              >
+                Instagram
+              </a>
+              <a
+                href="https://www.facebook.com/theshivammaheshwari"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-500 transition"
+                aria-label="Facebook"
+              >
+                Facebook
+              </a>
+              <a
+                href="https://www.linkedin.com/in/shivammaheshwary1/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sky-600 hover:text-sky-500 transition"
+                aria-label="LinkedIn"
+              >
+                LinkedIn
+              </a>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
